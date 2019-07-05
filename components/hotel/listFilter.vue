@@ -63,7 +63,7 @@ export default {
         this.list[1].data = data.types
         this.list[2].data = data.assets
         this.list[3].data = data.brands
-        console.log(data)
+        // console.log(data)
     })
   }
 };

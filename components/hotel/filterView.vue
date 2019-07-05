@@ -2,17 +2,22 @@
   <div class="container">
     <el-row>
       <el-col :span="24">
-        <el-dropdown>
-          <span class="el-dropdown-link">
-            不限
-            <i class="el-icon-arrow-down el-icon--right"></i>
-          </span>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item v-for="(item,index) in list" :key="index">
-              <el-radio v-model="radio" label="1">{{item.name}}</el-radio>
-            </el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
+        <el-select
+          v-model="condition"
+          multiple
+          filterable
+          allow-create
+          default-first-option
+          placeholder="不限"
+        >
+          <el-option
+            v-for="(item,index) in list"
+            :key="index"
+            :label="item.name"
+            :value="item.name"
+          >
+          </el-option>
+        </el-select>
       </el-col>
     </el-row>
   </div>
@@ -27,7 +32,8 @@ export default {
   },
   data() {
     return {
-      radio: ""
+      radio: "",
+      condition:[]
     };
   },
   mounted() {}

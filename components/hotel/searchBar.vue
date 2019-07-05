@@ -29,7 +29,7 @@ export default {
     handelgetData(){
         const enterTime = moment(this.time[0]).format('YYYY-MM-DD');//入住的日期
         const leftTime = moment(this.time[1]).format('YYYY-MM-DD')//离店的日期
-        console.log(enterTime)
+        // console.log(enterTime)
     }
   }
 };

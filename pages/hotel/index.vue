@@ -21,14 +21,21 @@
     </el-row>
     <!-- 过滤条件 -->
     <ListFilter/>
+    <!-- 数据列表展现 -->
+    <ItemView/>
   </div>
 </template>
 <script>
 // 引入搜索栏组件
 import BearchBar from "@/components/hotel/searchBar";
+// 引入区域数据
 import SearchOptions from "@/components/hotel/searchOptions";
+// 引入地图
 import MapView from "@/components/hotel/mapView";
+// 引入过滤条件选择框
 import ListFilter from "@/components/hotel/listFilter";
+// 引入数据展现
+import ItemView from "@/components/hotel/itemView";
 export default {
   data() {
     return {};
@@ -37,7 +44,8 @@ export default {
     BearchBar,
     SearchOptions,
     MapView,
-    ListFilter
+    ListFilter,
+    ItemView
   },
   mounted () {
     

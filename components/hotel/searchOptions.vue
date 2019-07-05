@@ -69,7 +69,7 @@ export default {
     }).then(res => {
       const { data } = res.data;
       this.areaList = data[0].scenics;
-      console.log(data[0].scenics);
+      // console.log(data[0].scenics);
     });
   }
 };
