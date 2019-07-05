@@ -141,7 +141,14 @@ export default {
     },
     // 写文件事件
     handelPushCreate(){
-      this.$router.push('/post/create')
+      const token = this.$store.state.user.userInfo.token
+      // 判断是否有token值
+      if(token){
+        this.$router.push('/post/create')
+      }else{
+        this.$router.push('/user/login?post=""&create=""')
+      }
+      
     }
   }
 };

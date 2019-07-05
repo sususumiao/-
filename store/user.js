@@ -1,4 +1,3 @@
-
 // 创建一个本地仓库
 export const state = () => ({
     userInfo: {

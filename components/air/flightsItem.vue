@@ -32,11 +32,18 @@
       <!-- 隐藏的座位信息列表 -->
       <el-row type="flex" justify="space-between" align="middle">
         <el-col :span="4">低价推荐</el-col>
-        <el-col :span="20" >
-          <el-row type="flex" justify="space-between" align="middle" class="flight-sell"
-          v-for="(item,index) in data.seat_infos" :key="index">
+        <el-col :span="20">
+          <el-row
+            type="flex"
+            justify="space-between"
+            align="middle"
+            class="flight-sell"
+            v-for="(item,index) in data.seat_infos"
+            :key="index"
+          >
             <el-col :span="16" class="flight-sell-left">
-              <span>{{item.group_name}}</span> | {{item.supplierName}}
+              <span>{{item.group_name}}</span>
+              | {{item.supplierName}}
             </el-col>
             <el-col :span="5" class="price">￥{{item.par_price}}</el-col>
             <el-col :span="3" class="choose-button">
@@ -54,7 +61,7 @@
 export default {
   data() {
     return {
-        isShow:false
+      isShow: false
     };
   },
 
@@ -66,17 +73,22 @@ export default {
       default: {}
     }
   },
-  methods:{
+  methods: {
     // 选定机票
-    handleOnOrder(item){
+    handleOnOrder(item) {
       // console.log(this.data)
-      this.$router.push({
-        path:'/air/order',
-        query:{
-          id:this.data.id,
-          seat_xid:item.seat_xid
-        }
-      })
+      const token = this.$store.state.user.userInfo.token;
+      if (token) {
+        this.$router.push({
+          path: "/air/order",
+          query: {
+            id: this.data.id,
+            seat_xid: item.seat_xid
+          }
+        });
+      }else{
+        this.$router.push('/user/login?air=""')
+      }
     }
   },
   computed: {
@@ -90,7 +102,8 @@ export default {
         arr[0] += 24;
       }
       const hour = Math.floor(arr[0] - dep[0]);
-      const minute =(arr[0] * 60 + Number(arr[1]) - (dep[0] * 60 + Number(dep[1]))) % 60;
+      const minute =
+        (arr[0] * 60 + Number(arr[1]) - (dep[0] * 60 + Number(dep[1]))) % 60;
       return hour + "时" + minute + "分";
     }
   }
