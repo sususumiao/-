@@ -3,17 +3,21 @@
     <el-row
       type="flex"
       justify="space-between"
-      v-for="(item,index) in dataList"
+      v-for="(item,index) in data.data"
       :key="index"
       class="main"
     >
       <el-col :span="8" class="left">
-        <img :src="item.photos" alt />
+        <nuxt-link :to="'/hotel/'+item.id+'.html'">
+          <img :src="item.photos" alt />
+        </nuxt-link>
       </el-col>
       <el-col :span="11" class="contre">
-        <h2 class="contre-title">{{item.name}}</h2>
+        <nuxt-link :to="'/hotel/'+item.id+'.html'">
+          <h2 class="contre-title">{{item.name}}</h2>
+        </nuxt-link>
         <p class="contre-english-title">
-          <span >{{item.alias}}</span>
+          <span>{{item.alias}}</span>
           <i
             v-for="(item2,index2) in item.hotellevel&&item.hotellevel.level"
             :key="index2"
@@ -46,19 +50,37 @@
         </span>
       </el-col>
       <el-col :span="5" class="right">
-          <div v-for="(item3,index3) in item.products" :key="index3" class="right-row">
-            <span>{{item3.name}}</span>
-            <div class="right-fr">
-              <em class="orange">￥{{item3.price}}</em>起
-              <i class="el-icon-arrow-right"></i>
-            </div>
+        <div v-for="(item3,index3) in item.products" :key="index3" class="right-row">
+          <span>{{item3.name}}</span>
+          <div class="right-fr">
+            <em class="orange">￥{{item3.price}}</em>起
+            <i class="el-icon-arrow-right"></i>
           </div>
+        </div>
       </el-col>
     </el-row>
+    <!-- 分页器 -->
+    <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="pageIndex"
+      :page-sizes="[5, 10, 15, 20]"
+      :page-size="pageSize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="data.total"
+    ></el-pagination>
   </div>
 </template>
 <script>
 export default {
+  props: {
+    data: {
+      type: Object,
+      default: {
+        data: {}
+      }
+    }
+  },
   data() {
     return {
       // 酒店数据
@@ -69,7 +91,10 @@ export default {
           },
           hoteltype: {}
         }
-      ]
+      ],
+      pageSize: 5,
+      pageIndex: 1,
+      total: 0
     };
   },
   methods: {
@@ -77,18 +102,29 @@ export default {
       this.$axios({
         url: "http://157.122.54.189:9095/hotels",
         params: {
-          city: "74",
+          city: this.$route.query.city,
           price_lt: 4000
         }
       }).then(res => {
         const { data } = res.data;
         this.dataList = data;
-        console.log(data);
+        // this.$router.push('/hotel?city='+)
+        // console.log(data);
       });
+    },
+    handleSizeChange(val) {
+      // console.log(`每页 ${val} 条`);
+      this.pageSize = val;
+      this.$emit("getPageSize", val);
+    },
+    handleCurrentChange(val) {
+      // console.log(`当前页: ${val}`);
+      this.pageIndex = val;
+      this.$emit("getPageIndex", val);
     }
   },
   mounted() {
-    this.getList();
+    // console.log(this.data)
   }
 };
 </script>
@@ -105,52 +141,50 @@ export default {
       }
     }
     // 中间内容部分
-    .contre{
-      .contre-title{
+    .contre {
+      .contre-title {
         font-size: 26px;
-        font-weight:500;
+        font-weight: 500;
       }
-      .contre-english-title{
+      .contre-english-title {
         color: #aaa;
       }
-      .contre-grade{
-        margin:10px 0;
-        .el-rate{
+      .contre-grade {
+        margin: 10px 0;
+        .el-rate {
           display: inline-block;
-          
         }
-        span{
+        span {
           display: inline-block;
           padding-top: 2px;
           font-size: 15px;
           padding: 0 10px;
         }
       }
-      .contre-location{
+      .contre-location {
         color: #666;
         font-size: 14px;
       }
-      
     }
     // 右边内容部分
-    .right{
+    .right {
       padding-top: 20px;
-      .right-row{
+      .right-row {
         padding: 10px;
         font-size: 14px;
         color: #666;
         border-bottom: 1px solid #ccc;
-        .right-fr{
+        .right-fr {
           display: inline-block;
           float: right;
         }
-        &:hover{
+        &:hover {
           background-color: #eee;
         }
       }
     }
-    .orange{
-      color: orange
+    .orange {
+      color: orange;
     }
   }
 }

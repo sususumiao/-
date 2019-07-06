@@ -9,12 +9,13 @@
           allow-create
           default-first-option
           placeholder="不限"
+          @change="handelCondition"
         >
           <el-option
             v-for="(item,index) in list"
             :key="index"
             :label="item.name"
-            :value="item.name"
+            :value="item.id"
           >
           </el-option>
         </el-select>
@@ -34,7 +35,14 @@ export default {
     return {
       radio: "",
       condition:[]
-    };
+    }
+  },
+  methods:{
+    // 获取选中的数据
+    handelCondition(val){
+
+      console.log(this.condition)
+    }
   },
   mounted() {}
 };

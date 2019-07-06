@@ -5,8 +5,15 @@
 </template>
 <script>
 export default {
+  props:{
+    data:{
+      type:Array,
+      default:[]
+    }
+  },
   data() {
-    return {};
+    return {
+    };
   },
   mounted() {
     // 加载地图
