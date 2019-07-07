@@ -17,7 +17,7 @@
       </el-col>
       <el-col :span="10" class="map">
         <!-- 地图 -->
-        <MapView width="420" height="420" :data="getList1" />
+        <MapView class="map-contre" :data="getList1" />
       </el-col>
     </el-row>
     <!-- 过滤条件 -->
@@ -121,6 +121,12 @@ export default {
     padding: 10px 0;
     .map {
       padding-left: 10px;
+      width:420px;
+      height:260px;
+      .map-contre{
+      width:420px;
+      height:260px;
+      }
     }
   }
 }

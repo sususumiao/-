@@ -5,12 +5,12 @@
 </template>
 <script>
 export default {
-  props:{
-    data:{
-      type:Array,
-      default:[]
-    }
-  },
+  // props:{
+  //   data:{
+  //     type:Array,
+  //     default:[]
+  //   }
+  // },
   data() {
     return {
     };
@@ -32,9 +32,8 @@ export default {
 </script>
 <style lang="less" scoped>
 #container {
-  width: 420px;
-  height: 260px;
-  padding-left: 10px;
+  width: 100%;
+  height: 100%;
 }
 </style>
 

@@ -73,14 +73,7 @@
 </template>
 <script>
 export default {
-  props: {
-    data: {
-      type: Object,
-      default: {
-        data: {}
-      }
-    }
-  },
+  props: ['data'],
   data() {
     return {
       // 酒店数据
