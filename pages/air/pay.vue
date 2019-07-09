@@ -87,6 +87,7 @@ export default {
             if(isPay){
                 this.$message.success("付款成功");
                 clearInterval(this.timer); //清除当前定时器
+                this.$router.push('/')
                 return;
             }
         },3000)

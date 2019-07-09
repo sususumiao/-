@@ -34,15 +34,23 @@ export default {
   methods: {
     //   登录按钮
     handleLoginSubmit() {
+      const { post, create, air } = this.$route.query;
       this.$refs.ruleForm.validate(valid => {
         if (valid) {
           this.$store
             .dispatch("user/getPostUserInfo", this.formData)
             .then(res => {
-              this.$message.success("登录成功");
+              this.$message.success("登录成功,正在跳转......");
               setTimeout(() => {
-                this.$router.push("/");
-              }, 1000);
+                // 跳转写文章页
+                if (post && create) {
+                  this.$router.push("/post/create");
+                } else if (air) {
+                  this.$router.push("/air");
+                } else {
+                  this.$router.push("/");
+                }
+              }, 2000);
             });
         }
       });
