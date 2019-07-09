@@ -2,7 +2,6 @@ import pkg from './package'
 
 export default {
   mode: 'universal',
-
   /*
   ** Headers of the page
   */
@@ -34,6 +33,7 @@ export default {
     'quill/dist/quill.snow.css',
     'quill/dist/quill.bubble.css',
     'quill/dist/quill.core.css'
+    
   ],
 
   /*
@@ -45,7 +45,8 @@ export default {
     { src: '@/plugins/localStorage', ssr: false },
     '@/plugins/axios',
     // 配置vue-quill-editor
-    { src: '@/plugins/nuxt-quill-plugin.js', ssr: false }
+    { src: '~plugins/nuxt-quill-plugin.js', ssr: false }
+ 
 
   ],
 
@@ -71,6 +72,8 @@ export default {
   */
   build: {
     transpile: [/^element-ui/],
+    transpile: [/^'vue-quill-editor'/],
+    
 
     /*
     ** You can extend webpack config here

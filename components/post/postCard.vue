@@ -1,217 +1,213 @@
 <template>
-  <div>
-    <div v-for="(item,index) in $store.state.post.articleList" :key="index">
-      <div class="layout1" v-if="item.images.length>1">
-        <nuxt-link class="layout1Title" :title="item.title" :to="'/post/detail?id='+item.id">{{item.title}}</nuxt-link>
-        <nuxt-link :to="'/post/detail?id='+item.id"><p v-html="item.summary"></p></nuxt-link>
-        <el-row class="layout1Img">
-          <nuxt-link :to="'/post/detail?id='+item.id" v-for="(item2,index) in item.images" :key="index">
-            <img :src="item2">
-          </nuxt-link>
-        </el-row>
-        <el-row class="layout1Bottom">
-          <i class="el-icon-location-outline"></i>
-          <span>{{item.cityName}}&nbsp;&nbsp;&nbsp;by</span>
-          <nuxt-link to="/">
-            <img :src="$axios.defaults.baseURL + item.account.defaultAvatar" alt>
-            <i>{{item.account.nickname}}</i>
-          </nuxt-link>
-          <i class="el-icon-view"></i>
-          <span>{{item.watch || 0}}</span>
-          <em class="layout1Praise">{{item.like ||0}}赞</em>
-        </el-row>
-      </div>
-      <div class="layout2" v-else>
-        <el-row>
-          <div class="layout2Left">
-            <nuxt-link :to="'/post/detail?id='+item.id" v-for="(item3,index) in item.images" :key="index">
-              <img :src="item3">
-            </nuxt-link>
-          </div>
-          <div class="layout2Right">
-            <nuxt-link class="layout2Title" :title="item.title" :to="'/post/detail?id='+item.id">{{item.title}}</nuxt-link>
-            <nuxt-link :to="'/post/detail?id='+item.id"><p v-html="item.summary"></p></nuxt-link> 
-            <el-row class="layout2Bottom">
-              <i class="el-icon-location-outline"></i>
-              <span>{{item.cityName}}&nbsp;&nbsp;&nbsp;by</span>
-              <nuxt-link to="/">
-                <img :src="$axios.defaults.baseURL + item.account.defaultAvatar" alt>
-                <i>{{item.account.nickname}}</i>
-              </nuxt-link>
-              <i class="el-icon-view"></i>
-              <span>{{item.watch || 0}}</span>
-              <em class="layout2Praise">{{item.like ||0}}赞</em>
-            </el-row>
-          </div>
-        </el-row>
-      </div>
+  <div class="conten">
+    <div class="reight clearfix">
+      <input type="text" placeholder="请输入想去的地方，比如：“广州”" v-model="search" />
     </div>
-    <!-- 分页器区域功能 -->
-    <el-row type="flex" justify="center">
+    <div class="recommend">
+      <div>
+        推荐:
+        <a href="javascript:;">广州</a>
+        <a href="javascript:;">上海</a>
+        <a href="javascript:;">北京</a>
+      </div>
+      <div class="recommendvv">
+        <h2>推荐攻略</h2>
+        <span @click="traveldiary">写游记</span>
+      </div>
+      <!-- 文章 -->
+      <div class="xxx">
+        <div>
+          <div v-for="(item,index) in newPsotListData" :key="index +'r'" @click='TheArticleDetails(item.id)'>
+            <h4>{{item.title}}</h4>
+            <div class="zzz">
+              <img
+                v-for="(item2,index1) in item.images"
+                :key="index1+'r'"
+                :src="item2"
+                alt
+                v-show="item.images.length<=1"
+              />
+              <div class="vvv" v-html="item.summary"></div>
+              <img
+                v-for="(item1,index2) in item.images"
+                :key="index2"
+                :src="item1"
+                alt
+                v-show="item.images.length>1&&index2<3"
+              />
+              <div>
+                <span>北京市</span>
+                <span>by</span>
+                <span>头像</span>
+                <span>地球发动机</span>
+                <span>·1005</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :current-page="list.currentPage +1"
-        :page-sizes="[3, 6, 9, 12]"
-        :page-size="list.pagesize"
+        :current-page="pagIndex"
+        :page-sizes="[1, 2, 3]"
+        :page-size="100"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="$store.state.post.list.total"
+        :total="total"
       ></el-pagination>
-    </el-row>
+    </div>
   </div>
 </template>
 <script>
+import { async } from "q";
 export default {
   data() {
     return {
-      // 文章总数据
-      articleList: [],
-      // 分页器数据
-      list: {
-        currentPage: 0,
-        total: 0,
-        pageSize: 3
-      }
+      // 搜索值
+      search: "",
+      // 总页数
+      total: 0,
+      // 总数据
+      PsotListData: [],
+      // 渲染数据
+      newPsotListData: [],
+      // 缓存数据
+      chunPsotListData: [],
+      // 当前页
+      pagIndex: 0,
+      // 每页显示数据量
+      pageSize: 3
     };
   },
+
   methods: {
-    // 获取文章数据
-    getList() {
-      this.$store.dispatch('post/getList')
+    TheArticleDetails(id){
+      this.$router.push({
+        path:"post/detail",
+        query:{
+          id
+        }
+      })
     },
-    // 切换页面数据数量
+    getPostDataList() {
+      this.$axios({
+        url: `http://157.122.54.189:9095/posts?_start=${this.pagIndex}&_limit=${this.pageSize}`
+      }).then(({ data }) => {
+        console.log(data);
+        this.total = data.total;
+        this.chunPsotListData = JSON.parse(JSON.stringify(data.data));
+        this.newPsotListData = JSON.parse(JSON.stringify(data.data)).splice(
+          0,
+          3
+        );
+        this.PsotListData = JSON.parse(JSON.stringify(data.data));
+      });
+    },
+    traveldiary() {
+      this.$router.push("/post/traveldiary");
+    },
     handleSizeChange(val) {
-      this.$store.commit('post/handleSizeChange',val)
-      this.$store.dispatch('post/getList')
+      this.pageSize = val;
+      this.getPostDataList();
     },
-    // 切换页面方法
     handleCurrentChange(val) {
-      this.$store.commit('post/handleCurrentChange',val)
-      this.$store.dispatch('post/getList')
-    },
-    // 跳转页面
-    handlePush(id){
-      this.$router.push('/post/detail?id='+id)
+      this.pagIndex = val;
+      this.getPostDataList();
     }
   },
   mounted() {
-     this.$store.dispatch('post/getList')
+    this.getPostDataList();
   }
 };
 </script>
+<style lang='less' scoped>
+// 文章列表部分
+.xxx {
+  height: 100%;
 
-<style lang="less" scoped>
-.layout1 {
-  padding-bottom: 20px;
-  border-bottom: 1px solid #ccc;
-  .layout1Title {
-    display: block;
-    padding: 10px 0;
-    font-size: 16px;
-    color: #333;
-    cursor: pointer;
+  .zzz {
+    .vvv {
+      height: 65px;
+      display: inline-block;
+      width: 748px;
+    }
+  }
+  h4 {
+    margin: 15px 0;
     &:hover {
-      color: orange;
+      color: #ffb800;
     }
   }
-  p {
-    font-size: 14px;
-    height: 57px;
-    overflow: hidden;
-    cursor: pointer;
-  }
-  .layout1Img {
+  img {
+    display: inline-block;
+    width: 240px;
     height: 150px;
-    margin: 10px 0;
-    width: 700px;
+  }
+  div {
+    display: -webkit-box;
     overflow: hidden;
-    a {
-      width: 220px;
-      margin-right: 20px;
-      img {
-        width: 220px;
-        height: 150px;
-      }
-      &:last-child {
-        margin: 0;
-      }
-    }
-  }
-  .layout1Bottom {
-    font-size: 12px;
-    color: #999;
-    a {
-      img {
-        width: 16px;
-        height: 16px;
-        vertical-align: middle;
-        padding: 3px;
-      }
-      i {
-        display: inline-block;
-        color: orange;
-      }
-    }
-  }
-  .layout1Praise {
-    float: right;
-    color: orange;
-    font-size: 16px;
+    white-space: normal !important;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
 }
-.layout2 {
-  height: 150px;
-  padding: 25px 0;
-  border-bottom: 1px solid #ccc;
-  .layout2Left {
+// 搜索部分
+.conten {
+  height: 100%;
+  .reight {
     float: left;
-    width: 220px;
-    img {
-      width: 220px;
-      height: 150px;
+    margin-top: 28px;
+    margin-left: 10px;
+    input {
+      width: 720px;
+      height: 40px;
+      border: 2px solid #ffb800;
     }
   }
-  .layout2Right {
-    float: right;
-    width: 470px;
-    .layout2Title {
-      display: block;
-      padding: 10px 0;
-      font-size: 16px;
-      color: #333;
-      cursor: pointer;
-      &:hover {
-        color: orange;
-      }
+  .left {
+    float: left;
+  }
+}
+.recommend {
+  width: 720px;
+  float: left;
+  margin-left: 10px;
+  .recommendvv {
+    border-bottom: 1px solid #999;
+    color: #ffb800;
+    h2 {
+      display: inline-block;
+      margin-top: 5px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #ffb800;
     }
-    p {
-      font-size: 14px;
-      height: 57px;
-      overflow: hidden;
-      cursor: pointer;
-    }
-    .layout2Bottom {
-      font-size: 12px;
-      color: #999;
-      margin-top: 20px;
-      a {
-        img {
-          width: 16px;
-          height: 16px;
-          vertical-align: middle;
-          padding: 3px;
-        }
-        i {
-          display: inline-block;
-          color: orange;
-        }
-      }
-    }
-    .layout2Praise {
+    span {
       float: right;
-      color: orange;
-      font-size: 16px;
+      display: block;
+      width: 130px;
+      height: 40px;
+      line-height: 40px;
+      padding-left: 40px;
+      border-radius: 10px;
+      background: #66b1ff;
+      color: #fff;
+      &:hover {
+        color: aliceblue;
+        background: #5289d1;
+      }
     }
   }
+}
+.clearfix:after {
+  content: ".";
+  display: block;
+  height: 0;
+  visibility: hidden;
+  clear: both;
+}
+.clearfix {
+  *zoom: 1;
 }
 </style>
