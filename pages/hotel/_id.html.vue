@@ -64,30 +64,7 @@
       </el-table-column>
     </el-table>
     <!-- 地图部分 -->
-    <el-row class="map">
-      <!-- 地图 -->
-      <el-col :span="16">
-        <MapView class="map-left" />
-      </el-col>
-      <!-- tab栏 -->
-      <el-col :span="8">
-        <el-tabs v-model="place" @tab-click="handleClick">
-          <el-tab-pane label="风景" name="first">
-            <div>
-              <ol>
-                <li>1212</li>
-                <li>1212</li>
-                <li>1212</li>
-                <li>1212</li>
-                <li>1212</li>
-                <li>1212</li>
-              </ol>
-            </div>
-          </el-tab-pane>
-          <el-tab-pane label="交通" name="second">配置管理</el-tab-pane>
-        </el-tabs>
-      </el-col>
-    </el-row>
+    <Map :scenicList="scenicList" :trafficList="trafficList" />
     <!-- 酒店信息 -->
     <div class="grogshop-message">
       <el-row class="message-row">
@@ -140,18 +117,31 @@
       </el-row>
     </div>
     <!-- 评论列表 -->
-    <!-- <CommentsView/> -->
+    <CommentsView :data="commentList" />
+    <!-- 分页 -->
+    <el-row type="flex" justify="center">
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="pageIndex"
+        :page-sizes="[2, 4, 6, 8]"
+        :page-size="pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total"
+      ></el-pagination>
+    </el-row>
   </div>
 </template>
 <script>
-import MapView from "@/components/hotel/mapView";
+import Map from "@/components/hotel/map";
 import CommentsView from "@/components/hotel/commentsView";
 export default {
   data() {
     return {
       hotel: {
         hotellevel: {},
-        pics: [{ url: "" }]
+        pics: [{ url: "" }],
+        location: {}
       },
       // 图片数据
       piceList: [
@@ -187,42 +177,100 @@ export default {
         total: 0
       },
       //   评论数据
-    commentList:[],
-    total:0,
+      commentList: [],
+      // 评论的总数
+      total: 0,
+      //
+      pageIndex: 1,
+      pageSize: 2,
+      // 获取到是周围风景列表
+      scenicList: [],
+      // 获取到周围的交通列表
+      trafficList: []
     };
   },
   components: {
-    MapView,
+    Map,
     CommentsView
   },
   mounted() {
     const {
       params: { id }
     } = this.$route;
-    console.log(id);
+    // console.log(id);
     this.$axios({
       url: "http://157.122.54.189:9095/hotels",
       params: { id }
     }).then(res => {
       this.hotel = res.data.data[0];
+      localStorage.setItem("latitude", this.hotel.location.latitude);
+      localStorage.setItem("longitude", this.hotel.location.longitude);
       // console.log(this.hotel);
+      // 获取周围数据
+      this.getPois("风景名胜").then(res => {
+        // console.log(res)
+        this.scenicList = res;
+      });
+      this.getPois("交通设施服务").then(res => {
+        this.trafficList = res;
+      });
     });
+
     // 获取评论数据
-    this.$axios({
-          url:'http://157.122.54.189:9095/hotels/comments',
-          params:{ id }
-      }).then(res=>{
-          const{data} = res.data
-          this.commentList = data
-          this.total = res.data.total
-          console.log(res)
-      })
+    this.getCommentList();
   },
   methods: {
+    // 跳转到别的页面
     onPriceRowClick() {
       window.open("https://hotels.ctrip.com/hotel/694679.html");
     },
-    handleClick() {}
+    // 获取评论数据
+    getCommentList() {
+      const {
+        params: { id }
+      } = this.$route;
+      this.$axios({
+        url: "http://157.122.54.189:9095/hotels/comments",
+        params: {
+          hotel: id,
+          _start: (this.pageIndex - 1) * this.pageSize,
+          _limit: this.pageSize
+        }
+      }).then(res => {
+        const { data } = res.data;
+        this.commentList = data;
+        this.total = res.data.total;
+      });
+    },
+    // 选择每页数据条
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.getCommentList();
+    },
+    // 选择跳转到第几页
+    handleCurrentChange(val) {
+      this.pageIndex = val;
+      this.getCommentList();
+    },
+    // 获取周围数据
+    getPois(data) {
+      return this.$axios({
+        url: "https://restapi.amap.com/v3/place/text?parameters",
+        params: {
+          city: this.hotel.real_city,
+          location: `${this.hotel.location.longitude},${this.hotel.location.latitude}`,
+          output: "json", //返回的类型
+          types: data,
+          page: 1,
+          offset: 10,
+          key: "79041dfa1c752f49599e2b507c64da42"
+        }
+      }).then(res => {
+        const { pois } = res.data;
+        return pois;
+        console.log(res);
+      });
+    }
   }
 };
 </script>
@@ -253,14 +301,6 @@ export default {
       }
     }
   }
-  // 地图样式
-  .map {
-    height: 360px;
-    .map-left {
-      height: 360px;
-      width: 650px;
-    }
-  }
   // 酒店信息样式
   .grogshop-message {
     padding: 20px 0;
@@ -283,11 +323,11 @@ export default {
   }
   // 评论样式
   .comment {
-    margin-bottom: 40px;;
+    margin-bottom: 40px;
     .comment-title {
       font-weight: 600;
       margin: 20px 0;
-      
+
       .comment-row {
         .comment-col {
           p {

@@ -60,7 +60,6 @@ export default {
   methods: {
     getGrogshop(data) {
       this.grogshopList1 = data
-      
     },
     getList(data){
       // console.log(data)
@@ -88,7 +87,7 @@ export default {
         const { data } = res;
         this.getList1 = data;
         // this.$router.push('/hotel?city='+)
-        // console.log(data);
+        console.log(data);
       });
     }
   },

@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <el-row class="comment-row" v-for="(item,index) in commentList" :key="index">
+    <el-row class="comment-row" v-for="(item,index) in data" :key="index">
       <el-col :span="3">
         <!-- 头像 -->
         <div class="block">
@@ -13,9 +13,9 @@
         </div>
       </el-col>
       <el-col :span="21">
-        <!-- <CommentView :data="item"/> -->
         <p class="comment-contre">{{item.content}}</p>
-        <el-input v-model="reply" placeholder="添加回复"></el-input>
+        <el-input v-model="reply" placeholder="添加回复,请按回车"></el-input>
+        <comments-view :data="item.followed" v-if="item.followed"/>
       </el-col>
     </el-row>
   </div>
@@ -24,28 +24,17 @@
 // import CommentView from "@/components/hotel/commentView"
 export default {
   name:'comments-view',
+  props:['data'],
   data() {
     return {
-      total:0,
-    //   评论数据
-    commentList:[]
+       // 回复数据
+      reply: ""
     };
   },
   mounted () {
-      this.$axios({
-          url:'http://157.122.54.189:9095/hotels/comments',
-          params:{
-              id:this.$route.query.id
-          }
-      }).then(res=>{
-          const{data} = res.data
-          this.commentList = data
-          this.total = res.data.total
-          console.log(this.commentList)
-      })
+    
   },
   components:{
-    // CommentView
   }
 };
 </script>
@@ -56,7 +45,11 @@ export default {
   .head{
       border: 2px solid orange;
   }
-  
+  .comment-contre {
+  display: block;
+  padding: 10px 0;
+  color: #666;
+}
 }
 </style>
 
