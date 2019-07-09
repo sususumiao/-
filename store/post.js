@@ -44,11 +44,10 @@ export const mutations = {
   },
   // 将数据添加到草稿
   setDraftsList(state, data) {
-    const newData = {
-      ...data,
-      time:moment(new Date()).format('YYYY-MM-DD')
-    }
-    state.draftsList.push(newData)
+      state.draftsList.push(data)
+  },
+  delDraftsList(state,index){
+    state.draftsList.splice(index,1)
   }
 }
 // 存放共同异步方法进行优化 dispatch
